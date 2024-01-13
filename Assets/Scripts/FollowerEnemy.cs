@@ -5,6 +5,7 @@ namespace Assets.Scripts
 {
     public class FollowerEnemy : Enemy // INHERITANCE
     {
+        // POLYMORPHISM
         public override void Attack()
         {
             if (transform.position.y > 0f)
