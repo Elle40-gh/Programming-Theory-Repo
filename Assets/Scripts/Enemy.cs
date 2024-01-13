@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public abstract class Enemy : MonoBehaviour
 {
-    private Rigidbody enemyRb;
-    private GameObject player;
+    protected Rigidbody enemyRb;
+    protected GameObject player;
 
     public float speed = 3.0f;
 
@@ -19,11 +19,12 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector3 director = player.transform.position - transform.position;
-        enemyRb.AddForce(director.normalized * speed);
+        Attack(); // ABSTRACTION
         if (transform.position.y < -10)
         {
             Destroy(gameObject);
         }
     }
+
+    public abstract void Attack();
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -8,7 +9,18 @@ public class PlayerController : MonoBehaviour
     private GameObject focalPoint;
 
     public float speed = 5.0f;
-    public bool hasPowerup;
+
+    // ENCAPSULATION
+    private bool hasPowerup;
+    public bool HasPowerup { 
+        get { return hasPowerup; } 
+        set { 
+            hasPowerup = value;
+            powerupIndicator.SetActive(true);
+            StartCoroutine("PowerupCountDownRoutine");
+        }
+    }
+
     public float powerUpStrength;
     public GameObject powerupIndicator;
 
@@ -26,18 +38,23 @@ public class PlayerController : MonoBehaviour
 
         playerRb.AddForce(focalPoint.transform.forward * speed * forwardInput);
         powerupIndicator.transform.position = new Vector3(transform.position.x, -0.5f, transform.position.z);
-    }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("Powerup"))
+        if (transform.position.y < -10)
         {
-            Destroy(other.gameObject);
-            hasPowerup = true;
-            StartCoroutine("PowerupCountDownRoutine");
-            powerupIndicator.SetActive(true);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
+
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    if (other.gameObject.CompareTag("Powerup"))
+    //    {
+    //        Destroy(other.gameObject);
+    //        hasPowerup = true;
+    //        StartCoroutine("PowerupCountDownRoutine");
+    //        powerupIndicator.SetActive(true);
+    //    }
+    //}
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -57,5 +74,17 @@ public class PlayerController : MonoBehaviour
 
         hasPowerup = false;
         powerupIndicator.SetActive(false);
+    }
+
+    public void Nuke()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach(GameObject enemy in enemies)
+        {
+            Rigidbody enemyRb = enemy.GetComponent<Rigidbody>();
+            Vector3 awayFromPlayer = enemy.transform.position - transform.position;
+
+            enemyRb.AddForce(awayFromPlayer * powerUpStrength, ForceMode.Impulse);
+        }
     }
 }
